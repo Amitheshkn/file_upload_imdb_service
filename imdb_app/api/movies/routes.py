@@ -30,7 +30,7 @@ def upload_file():
     return response
 
 
-@movies_app.route('/movies', methods=['GET'])
+@movies_app.route("/movies", methods=["GET"])
 @check_authentication
 def list_movies():
     page = request.args.get("page", 1, type=int)
@@ -47,7 +47,7 @@ def list_movies():
     return response
 
 
-@movies_app.route('/upload/item/<file_process_id>/status', methods=['GET'])
+@movies_app.route("/upload/item/<file_process_id>/status", methods=["GET"])
 @check_authentication
 def upload_status(file_process_id):
     actions = MovieActions()
