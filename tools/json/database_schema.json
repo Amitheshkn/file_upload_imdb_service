@@ -97,7 +97,7 @@
     ],
     "schema": {
       "user_id": {
-        "type": "ObjectId"
+        "type": "str"
       },
       "status": {
         "type": "str"
