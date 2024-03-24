@@ -1,5 +1,6 @@
 from flask import Blueprint
 from flask import request
+
 from imdb_app.api.auth.actions import UserActions
 
 auth_app = Blueprint("auth", __name__, template_folder="templates")

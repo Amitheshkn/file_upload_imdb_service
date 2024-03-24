@@ -1,4 +1,3 @@
-import datetime
 from typing import Optional
 
 from bson import ObjectId
@@ -7,7 +6,9 @@ from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.datastructures import FileStorage
 
 from imdb_app.api.movies.tasks import stream_file_to_db
+from imdb_app.common.definitions import Collection
 from imdb_app.db.mongo_adapters import MongoAdapter
+import imdb_app.api.movies.collection_structures as coll
 
 
 class MovieActions:
@@ -27,14 +28,7 @@ class MovieActions:
                      file_path: str,
                      user_ctx: dict[str, str]):
         try:
-            now = datetime.datetime.utcnow(),
-            file_identifier = MongoAdapter("file_process").insert_one({
-                "user_id": user_ctx.get("user_id"),
-                "status": "Initiated",
-                "created_at": now,
-                "updated_at": now
-            })
-            stream_file_to_db(file_path, file_identifier, "file_process", "movies")
+            file_identifier = stream_file_to_db(file_path, user_ctx, Collection.FILE_PROCESS, Collection.MOVIES)
             return {
                 "message": "CSV upload initiated",
                 "file_process_id": str(file_identifier)
@@ -45,17 +39,16 @@ class MovieActions:
 
     def get_movies(self,
                    page: int,
-                   /,
-                   *,
-                   page_size: int = 10):
-        collection_adapter = MongoAdapter("movies")
-        movies = collection_adapter.find_many({}, page_size=page_size, page=page)
-        total_count = collection_adapter.count_documents({})
-        # Optionally, convert the documents from BSON to JSON
-        # movies_json = dumps(movies)
+                   page_size: int = 10) -> dict:
+        skip = (page - 1) * page_size
+        collection_adapter = MongoAdapter(Collection.MOVIES)
+        docs = collection_adapter.find_documents({}, skip_value=skip, limit=page_size)
+        for doc in docs:
+            doc["movie_id"] = str(doc.pop("_id"))
 
+        total_count = collection_adapter.count_documents({})
         return {
-            "movies": movies,
+            "movies": docs,
             "total_count": total_count,
             "page": page,
             "page_size": page_size,
@@ -64,10 +57,10 @@ class MovieActions:
 
     def get_upload_status(self,
                           file_process_id: str):
-        file_processing_details = MongoAdapter("file_process").find_one({
+        file_processing_details = MongoAdapter(Collection.FILE_PROCESS).find_document({
             "_id": ObjectId(file_process_id)
         })
         return {
             "file_process_id": file_process_id,
-            "status": file_processing_details["status"]
+            "status": file_processing_details[coll.FileProcess.STATUS]
         }

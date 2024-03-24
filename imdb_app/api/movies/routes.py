@@ -8,8 +8,6 @@ from imdb_app.utils import store_files
 
 movies_app = Blueprint("movies", __name__, template_folder="templates")
 
-ALLOWED_EXTENSIONS = {"csv"}
-
 
 @movies_app.route("/upload", methods=["POST"])
 @check_authentication
@@ -27,19 +25,19 @@ def upload_file():
     file_path = store_files(file, "movies")
 
     user_ctx = get_user_ctx_from_token(request)
-    actions.process_file(file_path, user_ctx)
+    response = actions.process_file(file_path, user_ctx)
 
-    return jsonify({'message': 'File successfully uploaded and is being processed.'}), 202
+    return jsonify(response)
 
 
 @movies_app.route('/movies', methods=['GET'])
 @check_authentication
-def list_movies(current_user):
-    page = request.args.get('page', 1, type=int)
-    page_size = request.args.get('page_size', 10, type=int)
+def list_movies():
+    page = request.args.get("page", 1, type=int)
+    page_size = request.args.get("page_size", 10, type=int)
 
     actions = MovieActions()
-    response = actions.get_movies(page, page_size=page_size)
+    response = actions.get_movies(page, page_size)
     return jsonify(response)
 
 
