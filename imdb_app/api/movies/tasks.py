@@ -1,27 +1,34 @@
 import datetime
 import os
+from threading import Thread
 
 import pandas as pd
 from bson import ObjectId
-from threading import Thread
+
+import imdb_app.api.movies.collection_structures as coll
 from imdb_app.common.definitions import Collection
 from imdb_app.common.definitions import FileStatus
-import imdb_app.api.movies.collection_structures as coll
 from imdb_app.db.mongo_adapters import MongoAdapter
 
 
 def update_file_processing_status(file_identifier: ObjectId,
                                   collection_name: Collection,
-                                  status: FileStatus) -> None:
+                                  status: FileStatus,
+                                  /,
+                                  *,
+                                  output: str = None) -> None:
     collection_adapter = MongoAdapter(collection_name)
+    update_query = {
+                coll.FileProcess.STATUS: status,
+                coll.FileProcess.UPDATED_AT: datetime.datetime.utcnow()
+            }
+    if output:
+        update_query[coll.FileProcess.OUTPUT] = output
     collection_adapter.update_document({
-        "_id": file_identifier
+        coll.FileProcess.ID: file_identifier
     },
         {
-            "$set": {
-                "status": status,
-                "updated_at": datetime.datetime.utcnow()
-            }
+            "$set": update_query
         })
 
 
@@ -47,7 +54,7 @@ def stream_file_to_db(filepath: str,
 def start_background_job_processing(filepath: str,
                                     file_identifier: ObjectId,
                                     process_collection_name: Collection,
-                                    import_collection_name: Collection):
+                                    import_collection_name: Collection) -> None:
     collection_adapter = MongoAdapter(import_collection_name)
     try:
         update_file_processing_status(file_identifier, process_collection_name, FileStatus.IN_PROGRESS)
@@ -68,7 +75,7 @@ def start_background_job_processing(filepath: str,
             collection_adapter.insert_documents(records)
         update_file_processing_status(file_identifier, process_collection_name, FileStatus.SUCCESS)
     except Exception as e:
-        update_file_processing_status(file_identifier, process_collection_name, FileStatus.FAILED)
-        print(f"Error processing file {filepath}: {e}")
+        update_file_processing_status(file_identifier, process_collection_name, FileStatus.FAILED, output=str(e))
+
     finally:
         os.remove(filepath)

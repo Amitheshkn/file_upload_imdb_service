@@ -1,6 +1,10 @@
 from enum import Enum
 
 
+class Database:
+    MARROW = "Marrow"
+
+
 class Collection(Enum):
     USERS = "users"
     MOVIES = "movies"

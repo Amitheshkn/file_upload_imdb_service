@@ -4,6 +4,7 @@ class FileProcess:
     CREATED_AT = "created_at"
     UPDATED_AT = "updated_at"
     STATUS = "status"
+    OUTPUT = "output"
 
 
 class Movies:

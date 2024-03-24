@@ -1,10 +1,10 @@
 import datetime
 from typing import Any
 
-from flask import jsonify
 from flask import Response
-from werkzeug.security import generate_password_hash
+from flask import jsonify
 from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 from common.authorization import AuthorizationToken
 from imdb_app.api.auth.collection_structures import USER
@@ -15,7 +15,7 @@ from imdb_app.db.mongo_adapters import MongoAdapter
 class UserActions:
 
     def register(self,
-                 user_data):
+                 user_data) -> tuple[Response, int]:
         try:
             users_adapter = MongoAdapter(Collection.USERS)
             user_exists = users_adapter.find_document({
@@ -66,4 +66,4 @@ class UserActions:
         else:
             return jsonify({
                 "error": "User not found"
-            }), 400
+            }), 401

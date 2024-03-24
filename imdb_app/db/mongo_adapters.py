@@ -9,7 +9,7 @@ from imdb_app.db.mongo_client import get_collection
 
 class MongoAdapter:
     def __init__(self,
-                 collection_name: Collection):
+                 collection_name: Collection) -> None:
         self.collection = get_collection(collection_name)
 
     def find_document(self,

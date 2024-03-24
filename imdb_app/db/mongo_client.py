@@ -2,11 +2,13 @@ import pymongo.collection
 from pymongo import MongoClient
 
 from imdb_app.common.definitions import Collection
+from imdb_app.common.definitions import Database
+from imdb_app.core.config import CONF
 
 # Initialize MongoDB client
-uri = "mongodb+srv://amithesh_sde:4vRqegXKE8hQ1pgm@cluster0.5yf4ox1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+uri = CONF.database.mongo_uri
 mongo_client = MongoClient(uri)
-db = mongo_client['Marrow']
+db = mongo_client[Database.MARROW]
 
 
 def get_collection(collection_name: Collection) -> pymongo.collection.Collection:

@@ -2,13 +2,13 @@
 import sys
 
 from imdb_app.api import urls
+from imdb_app.core.config import CONF
 
 
 def main():
     try:
-        host = "0.0.0.0"
-        port = 18080
-
+        host = CONF.application.bind_host
+        port = CONF.application.bind_port
         print(f"Start IMDB REST API on {host}:{port}")
 
         urls.app.run(host, port, debug=True, threaded=True)
@@ -17,5 +17,5 @@ def main():
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

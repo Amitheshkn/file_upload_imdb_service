@@ -7,9 +7,11 @@ import jwt
 from flask import jsonify
 from flask import request
 
+from imdb_app.core.config import CONF
+
 
 class AuthorizationToken:
-    SECRET_KEY = "lolly-golly"
+    SECRET_KEY = CONF.application.secret_key
 
     def verify_token(self,
                      token: str,
@@ -52,9 +54,10 @@ def check_authentication(f) -> Callable:
                     "message": "Token is missing!"
                 }), 403
         except BaseException:
-            return jsonify(
-                {"message": "Invalid token"}
-            ), 401
+            return jsonify({
+                "message": "Invalid token"
+            }), 401
+
         return f(*args, **kwargs)
 
     return decorated_function
@@ -67,5 +70,4 @@ def get_user_ctx_from_token(request_: request) -> dict[str, str]:
         "user_id": decoded.get("ui"),
         "user_email": decoded.get("ue")
     }
-
     return user_context
