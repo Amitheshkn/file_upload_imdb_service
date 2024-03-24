@@ -3,7 +3,7 @@
 
 ## Description  
   
-Simple File Processing Service which takes CSV file as input through RESTAPI - process and store in Database. Authentication and List APIs are created for the same. Python Flask and Database Used - MongoDB (NoSQL).   
+Simple File Processing Service which takes CSV file as input through RESTAPI - process and store in Database. Authentication and List APIs are created for the user registration, authentication, check progress and list movies with pagination. Python's Flask Framework is used and for database - MongoDB is used.
  
 
 ## How to use  
@@ -32,5 +32,5 @@ Simple File Processing Service which takes CSV file as input through RESTAPI - p
 Start/Run the server
 
    ```bash
-    poetry run uvicorn app.main:app --reload
+    python3 run /file_upload_imdb_service/bin/imdb_app 
    ```
