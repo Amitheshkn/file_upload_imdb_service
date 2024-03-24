@@ -32,5 +32,5 @@ Simple File Processing Service which takes CSV file as input through RESTAPI - p
 Start/Run the server
 
    ```bash
-    python3 run /file_upload_imdb_service/bin/imdb_app 
+    python3 /file_upload_imdb_service/bin/imdb_app 
    ```
